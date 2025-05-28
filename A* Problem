@@ -1,0 +1,40 @@
+import heapq
+
+def a_star(start, goal, graph, heuristic):
+    open_set = []
+    heapq.heappush(open_set, (0 + heuristic(start, goal), 0, start, [start]))
+    closed_set = set()
+    
+    while open_set:
+        _, g, current, path = heapq.heappop(open_set)
+        
+        if current == goal:
+            return path
+        
+        if current in closed_set:
+            continue
+        closed_set.add(current)
+        
+        for neighbor, cost in graph[current].items():
+            if neighbor not in closed_set:
+                new_g = g + cost
+                heapq.heappush(open_set, (new_g + heuristic(neighbor, goal), new_g, neighbor, path + [neighbor]))
+    
+    return None
+
+# Example usage:
+graph = {
+    'A': {'B': 1, 'C': 3},
+    'B': {'A': 1, 'D': 2},
+    'C': {'A': 3, 'D': 1},
+    'D': {'B': 2, 'C': 1, 'E': 4},
+    'E': {'D': 4}
+}
+
+def manhattan_heuristic(node, goal):
+    points = {'A': (0, 0), 'B': (1, 0), 'C': (0, 1), 'D': (1, 1), 'E': (2, 1)}
+    x1, y1 = points[node]
+    x2, y2 = points[goal]
+    return abs(x1 - x2) + abs(y1 - y2)
+
+print(a_star('A', 'E', graph, manhattan_heuristic))
